@@ -119,7 +119,7 @@ class Trainer:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
-                all_text = generate_response(
+                all_results = generate_response(
                     self.model, 
                     self.train_type,
                     self.tokenizer, 
@@ -127,8 +127,8 @@ class Trainer:
                     max_length=self.max_output_length
                 )
                 
-                summarization_results = self.rouge_metric.compute(predictions=all_text["outputs"], references=all_text["labels"])
-                qa_results = compute_squad_metric(predictions=all_text["outputs"], references=all_text["labels"])
+                summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
+                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
@@ -168,7 +168,7 @@ class Trainer:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
-                all_text = generate_response(
+                all_results = generate_response(
                     self.model, 
                     self.train_type,
                     self.tokenizer, 
@@ -176,8 +176,8 @@ class Trainer:
                     max_length=self.max_output_length
                 )
                 
-                summarization_results = self.rouge_metric.compute(predictions=all_text["outputs"], references=all_text["labels"])
-                qa_results = compute_squad_metric(predictions=all_text["outputs"], references=all_text["labels"])
+                summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
+                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
@@ -421,7 +421,7 @@ class Green_Trainer:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
-                all_text = generate_response(
+                all_results = generate_response(
                     self.model, 
                     self.train_type,
                     self.tokenizer, 
@@ -429,8 +429,8 @@ class Green_Trainer:
                     max_length=self.max_output_length
                 )
                 
-                summarization_results = self.rouge_metric.compute(predictions=all_text["outputs"], references=all_text["labels"])
-                qa_results = compute_squad_metric(predictions=all_text["outputs"], references=all_text["labels"])
+                summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
+                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
@@ -470,7 +470,7 @@ class Green_Trainer:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
-                all_text = generate_response(
+                all_results = generate_response(
                     self.model, 
                     self.train_type,
                     self.tokenizer, 
@@ -478,8 +478,8 @@ class Green_Trainer:
                     max_length=self.max_output_length
                 )
                 
-                summarization_results = self.rouge_metric.compute(predictions=all_text["outputs"], references=all_text["labels"])
-                qa_results = compute_squad_metric(predictions=all_text["outputs"], references=all_text["labels"])
+                summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
+                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)

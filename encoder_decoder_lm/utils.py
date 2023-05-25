@@ -90,24 +90,29 @@ def generate_response(
     outputs_text = [tokenizer.decode(x, skip_special_tokens=True) for x in outputs_tokens]
     labels_text =  [tokenizer.decode(x, skip_special_tokens=True) for x in labels_tokens]
 
-    return {"labels": labels_text, "outputs": outputs_text}
+    return {
+        "labels_text": labels_text, 
+        "outputs_text": outputs_text, 
+        "labels_tokens": labels_tokens, 
+        "outputs_tokens": outputs_tokens,
+    }
 
 
-def compute_squad_metric(predictions, references):
+def compute_squad_metric(tokenizer, predictions, references):
     f1 = exact_match = 0
 
     for ground_truths, prediction in zip(references, predictions):
-        # # Remove pad token
-        # tokens_to_remove = {
-        #     self.tokenizer.pad_token_id,
-        #     self.tokenizer.eos_token_id,
-        #     self.tokenizer.bos_token_id,
-        #     self.tokenizer.cls_token_id,
-        #     self.tokenizer.sep_token_id,
-        #     self.tokenizer.mask_token_id
-        # }
-        # prediction = list(filter(lambda token: token not in tokens_to_remove, prediction))
-        # ground_truths = list(filter(lambda token: token not in tokens_to_remove, ground_truths))
+        # Remove pad token
+        tokens_to_remove = {
+            tokenizer.pad_token_id,
+            tokenizer.eos_token_id,
+            tokenizer.bos_token_id,
+            tokenizer.cls_token_id,
+            tokenizer.sep_token_id,
+            tokenizer.mask_token_id
+        }
+        prediction = list(filter(lambda token: token not in tokens_to_remove, prediction))
+        ground_truths = list(filter(lambda token: token not in tokens_to_remove, ground_truths))
         f1 += f1_score(prediction, ground_truths)
         exact_match += exact_match_score(prediction, ground_truths)
     
