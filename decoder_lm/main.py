@@ -17,26 +17,27 @@ from utils import make_folders
 # google/flan-t5-small (80M), google/flan-t5-base (250M), google/flan-t5-large (780M), google/flan-t5-xl (3B) (prefix="summarize: ")
 # scitldr -> [bs=16, in=512, out=256],
 
-# TODO implement flops counter for baselines
+# TODO implement flops parser for opt and gpt2
+# implement flops counter for baselines
 
 make_folders("logs", "saved_models")
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 scheme = 'baselines' # baselines or green_trainer
-train_type = 'full_finetuning' # full_finetuning, lora, prefix_tuning, adalora
+train_type = "full_finetuning"
 
 task = 'train' # train or evaluate
 
-model_name = "google/flan-t5-base"
-dataset_name = "duorcs"
-prefix = ""
-max_input_length = 1024
-max_output_length = 256
-batch_size = 16
+model_name = "facebook/opt-125m" # "facebook/opt-125m" "gpt2"
+dataset_name = "samsum"
+max_input_length = 512
+max_output_length = 512
+batch_size = 4
 
 if scheme == 'baselines':
-    
+
+    train_type = "full_finetuning" # "full_finetuning"
     model_path = f"saved_models/{model_name.replace('/', '_')}_{train_type}"
     
     model = load_text_generation_model(
@@ -47,10 +48,9 @@ if scheme == 'baselines':
         dataset_name=dataset_name,
         split="train",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=True,
         keep_in_memory=True,
         print_info=False,
@@ -60,10 +60,9 @@ if scheme == 'baselines':
         dataset_name=dataset_name,
         split="validation",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=False,
         keep_in_memory=True,
         print_info=False,
@@ -73,10 +72,9 @@ if scheme == 'baselines':
         dataset_name=dataset_name,
         split="test",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=False,
         keep_in_memory=True,
         print_info=False,
@@ -104,7 +102,7 @@ if scheme == 'baselines':
 elif scheme == 'green_trainer':
     
     train_type = scheme
-    rho = 0.5
+    rho = 0.7
     model_path = f"saved_models/{model_name.replace('/', '_')}_{train_type}_{rho}"
 
     model = load_text_generation_model(
@@ -115,10 +113,9 @@ elif scheme == 'green_trainer':
         dataset_name=dataset_name,
         split="train",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=True,
         keep_in_memory=True,
         print_info=False,
@@ -128,10 +125,9 @@ elif scheme == 'green_trainer':
         dataset_name=dataset_name,
         split="validation",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=False,
         keep_in_memory=True,
         print_info=False,
@@ -141,10 +137,9 @@ elif scheme == 'green_trainer':
         dataset_name=dataset_name,
         split="test",
         tokenizer_name=model_name,
+        model_name=model_name,
         max_input_length=max_input_length, 
-        max_output_length=max_output_length,
         batch_size=batch_size,
-        prefix=prefix,
         shuffle=False,
         keep_in_memory=True,
         print_info=False,
