@@ -4,21 +4,21 @@ from models import load_text_generation_model
 from data import dataset_loader
 from utils import make_folders
 
-# Evaluation Plan
+# TODO Evaluation Plan
 # (1) text summarization: 
-# google/flan-t5-base (250M) (prefix="summarize: ")
-# samsum -> [bs=16, in=512, out=256], 
+# facebook/opt-2.7b
+# facebook/opt-6.7b
+# bloomz-3b
+# bloomz-7b
+# decapoda-research/llama-7b-hf
 # scitldr -> [bs=16, in=512, out=256], 
+# samsum -> [bs=16, in=512, out=256], 
 # xsum, cnndailymail -> [bs=8, in=1024, out=256]
 # (2) abstractive question answering:
-# google/flan-t5-large (780M), google/flan-t5-xl (3B)
 # durocp, durocs -> [bs=8, in=1024, out=128], 
 # (3) impact of model complexity:
-# google/flan-t5-small (80M), google/flan-t5-base (250M), google/flan-t5-large (780M), google/flan-t5-xl (3B) (prefix="summarize: ")
+# facebook/opt-350m, facebook/opt-1.3b, facebook/opt-2.7b, facebook/opt-6.7b, facebook/opt-13b (13B)
 # scitldr -> [bs=16, in=512, out=256],
-
-# TODO implement flops parser for opt and gpt2
-# implement flops counter for baselines
 
 make_folders("logs", "saved_models")
 
