@@ -261,7 +261,7 @@ class Green_Trainer:
             model=self.model,
             model_name=self.model_type,
             input_length=input_length,
-            output_length=output_length,
+            # output_length=output_length,
             batch_size=batch_size,
             draw_figure=False,
         )
@@ -269,7 +269,7 @@ class Green_Trainer:
             model=self.model,
             model_name=self.model_type,
             input_length=input_length,
-            output_length=output_length,
+            # output_length=output_length,
             batch_size=batch_size,
         )
         
@@ -294,7 +294,11 @@ class Green_Trainer:
             w_0 = [param.data.clone().detach() for _, param in self.model.named_parameters()]
             
             batch = {k: v.to(self.device) for k, v in batch.items()}
-            outputs = self.model(**batch)
+            outputs = self.model(
+                input_ids=batch["input_ids"],
+                attention_mask=batch["attention_mask"],
+                labels=batch["labels"],
+            )
             loss = outputs.loss
             loss.backward()
             # perform update
@@ -307,7 +311,11 @@ class Green_Trainer:
             dw_0 = [w_1_k - w_0_k for (w_0_k, w_1_k) in zip(w_0, w_1)]
             
             # cache gradients
-            outputs = self.model(**batch)
+            outputs = self.model(
+                input_ids=batch["input_ids"],
+                attention_mask=batch["attention_mask"],
+                labels=batch["labels"],
+            )
             loss = outputs.loss
             loss.backward()
             grad_1 = [param.grad.clone().detach() for _, param in self.model.named_parameters()]
@@ -366,7 +374,11 @@ class Green_Trainer:
             
             for step, batch in enumerate(tqdm(self.train_loader)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}
-                outputs = self.model(**batch)
+                outputs = self.model(
+                    input_ids=batch["input_ids"],
+                    attention_mask=batch["attention_mask"],
+                    labels=batch["labels"],
+                )
                 loss = outputs.loss
                 total_loss += loss.detach().float()
                 loss.backward()
@@ -389,7 +401,11 @@ class Green_Trainer:
             for step, batch in enumerate(tqdm(self.val_loader)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 with torch.no_grad():
-                    outputs = self.model(**batch)
+                    outputs = self.model(
+                        input_ids=batch["input_ids"],
+                        attention_mask=batch["attention_mask"],
+                        labels=batch["labels"],
+                    )
                 loss = outputs.loss
                 eval_loss += loss.detach().float()
             
