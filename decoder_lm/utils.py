@@ -76,11 +76,11 @@ def generate_response(
     outputs_text = [tokenizer.decode(y[len(x):], skip_special_tokens=True) for y, x in zip(outputs_tokens, inputs_tokens)]
     labels_text =  [tokenizer.decode(x[offset:], skip_special_tokens=True)[1:] for x, offset in zip(labels_tokens, input_ids_lens)] # skip beginning space
     
-    for x, y in zip(labels_text, outputs_text):
-        print("#########################################")
-        print(f"LABEL: {x}")
-        print("#########################################")
-        print(f"GENERATED: {y}")
+#     for x, y in zip(labels_text, outputs_text):
+#         print("#########################################")
+#         print(f"LABEL: {x}")
+#         print("#########################################")
+#         print(f"GENERATED: {y}")
     
     return {
         "labels_text": labels_text, 
