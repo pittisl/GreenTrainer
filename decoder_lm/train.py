@@ -4,7 +4,7 @@ import time
 from peft import PeftModel
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-from transformers import get_linear_schedule_with_warmup, AutoModelForSeq2SeqLM
+from transformers import get_linear_schedule_with_warmup, AutoModelForCausalLM
 from utils import generate_response
 import numpy as np
 from tensor_selector import selection_DP, downscale_t_dy_and_t_dw
@@ -216,7 +216,7 @@ class Trainer:
             # if self.train_type == "lora" or self.train_type == "adalora":
             #     self.model.merge_and_unload()
         else:
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_path)
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
 
 
 class Green_Trainer:
@@ -530,5 +530,5 @@ class Green_Trainer:
         self.model.save_pretrained(self.model_path)
     
     def _load_model(self):
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_path)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
 
