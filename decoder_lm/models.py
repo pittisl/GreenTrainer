@@ -56,7 +56,7 @@ def load_text_generation_model(
             peft_type="LORA", 
             task_type="CAUSAL_LM", 
             inference_mode=False, 
-            r=8, lora_alpha=32, target_modules=["q", "v"],
+            r=8, lora_alpha=32, target_modules=["q_proj", "v_proj"], # ["q_proj", "v_proj"] for opt, ["query_key_value"] for bloom
             lora_dropout=0.1,
         )
         model = get_peft_model(model, peft_config)
