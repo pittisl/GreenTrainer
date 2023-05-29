@@ -106,13 +106,14 @@ class Trainer:
             
             print(f"epoch={epoch} train_ppl={train_ppl.item()} train_loss={train_epoch_loss.item()} eval_ppl={eval_ppl.item()} eval_loss={eval_epoch_loss.item()}")
             
-            self._runtime_evaluate()
+            self._runtime_evaluate(self.val_loader)
 
             self._save_model()
             
         print(f"Total Time: {total_time} (s)")
+        self._runtime_evaluate(self.test_loader)
     
-    def _runtime_evaluate(self):
+    def _runtime_evaluate(self, dataset):
         self.model.eval()
         # for summarization
         m_rouge1 = 0
@@ -125,7 +126,7 @@ class Trainer:
         
         total_count = 0
         with torch.no_grad():
-            for step, batch in enumerate(tqdm(self.val_loader)):
+            for step, batch in enumerate(tqdm(dataset)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
@@ -421,7 +422,7 @@ class Green_Trainer:
             
             print(f"epoch={epoch} train_ppl={train_ppl.item()} train_loss={train_epoch_loss.item()} eval_ppl={eval_ppl.item()} eval_loss={eval_epoch_loss.item()}")
             
-            self._runtime_evaluate()
+            self._runtime_evaluate(self.val_loader)
 
             self._save_model()
         
@@ -429,9 +430,10 @@ class Green_Trainer:
         print(f"Total GreenTrainer Backward GFLOPs: {len(self.train_loader) * np.sum(total_bp_flops):.2f}")
         print(f"Total GreenTrainer GFLOPs: {len(self.train_loader) * np.sum(total_bfp_flops):.2f}")
         print(f"Total GreenTrainer GFLOPs Speedup: {np.mean(total_bfp_speedup):.2f}x")
-    
-    
-    def _runtime_evaluate(self):
+        
+        self._runtime_evaluate(self.test_loader)
+        
+    def _runtime_evaluate(self, dataset):
         self.model.eval()
         # for summarization
         m_rouge1 = 0
@@ -444,7 +446,7 @@ class Green_Trainer:
         
         total_count = 0
         with torch.no_grad():
-            for step, batch in enumerate(tqdm(self.val_loader)):
+            for step, batch in enumerate(tqdm(dataset)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}
                 batch_size = batch['input_ids'].shape[0]
                     
