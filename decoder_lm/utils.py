@@ -54,7 +54,7 @@ def generate_response(
     if train_type == "prefix_tuning" or train_type == "lora" or train_type == "adalora":
         outputs_tokens = model.generate(
             input_ids=inputs_tokens,
-            max_new_tokens=128,
+            max_new_tokens=max_length,
             num_beams=4,
             repetition_penalty=2.5, 
             length_penalty=1.0, 
@@ -63,7 +63,7 @@ def generate_response(
     else:
         outputs_tokens = model.generate(
             inputs=inputs_tokens,
-            max_new_tokens=128,
+            max_new_tokens=max_length,
             num_beams=4,
             repetition_penalty=2.5, 
             length_penalty=1.0, 

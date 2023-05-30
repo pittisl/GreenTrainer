@@ -1,4 +1,5 @@
 import os
+import argparse
 from train import Trainer, Green_Trainer
 from models import load_text_generation_model
 from data import dataset_loader
@@ -20,20 +21,32 @@ from utils import make_folders
 # facebook/opt-350m, facebook/opt-1.3b, facebook/opt-2.7b, facebook/opt-6.7b, facebook/opt-13b (13B)
 # scitldr -> [bs=16, in=512, out=256],
 
-make_folders("logs", "saved_models")
+parser = argparse.ArgumentParser(description='parser for training decoder-only models')
+parser.add_argument('--model_name', type=str, default='facebook/opt-1.3b', help='opt and bloomz series')
+parser.add_argument('--dataset_name', type=str, default='scitldr', help='scitldr or dialogsum')
+parser.add_argument('--scheme', type=str, default='green_trainer', help='baselines or green_trainer')
+parser.add_argument('--train_type', type=str, default='full_finetuning', help='full_finetuning or lora')
+parser.add_argument('--max_input_length', type=int, default=512, help='number of input tokens for causal language modeling')
+parser.add_argument('--max_output_length', type=int, default=64, help='number of new output tokens for generation')
+parser.add_argument('--batch_size', type=int, default=4, help='batch size during training and generation')
+parser.add_argument('--rho', type=int, default=0.5, help='speedup ratio for GreenTrainer')
 
+args = parser.parse_args()
+
+make_folders("logs", "saved_models")
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
-scheme = 'baselines' # baselines or green_trainer
-train_type = "full_finetuning"
+scheme = args.scheme # baselines or green_trainer
+train_type = args.train_type
 
 task = 'train' # train or evaluate
 
-model_name = "facebook/opt-125m" # "facebook/opt-125m" "gpt2"
-dataset_name = "samsum"
-max_input_length = 512
-max_output_length = 512
-batch_size = 4
+model_name = args.model_name # "facebook/opt-125m" "gpt2"
+dataset_name = args.dataset_name
+max_input_length = args.max_input_length
+max_output_length = args.max_output_length
+batch_size = args.batch_size
+rho = args.rho
 
 if scheme == 'baselines':
 
@@ -102,7 +115,7 @@ if scheme == 'baselines':
 elif scheme == 'green_trainer':
     
     train_type = scheme
-    rho = 0.7
+    # rho = 0.7
     model_path = f"saved_models/{model_name.replace('/', '_')}_{train_type}_{rho}"
 
     model = load_text_generation_model(
