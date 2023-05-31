@@ -156,8 +156,8 @@ class Trainer:
         m_rougeLsum /= total_count
         m_f1 /= total_count
         m_em /= total_count
-        print(f"On validation set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On validation set, f1={m_f1}%, EM={m_em}%")
+        print(f"On validation/test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
+        print(f"On validation/test set, f1={m_f1}%, EM={m_em}%")
 
     def evaluate(self):
         self._load_model()
@@ -476,8 +476,8 @@ class Green_Trainer:
         m_rougeLsum /= total_count
         m_f1 /= total_count
         m_em /= total_count
-        print(f"On validation set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On validation set, f1={m_f1}%, EM={m_em}%")
+        print(f"On validation/test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
+        print(f"On validation/test set, f1={m_f1}%, EM={m_em}%")
 
     def evaluate(self):
         self._load_model()
