@@ -185,6 +185,8 @@ class Trainer:
         if accelerator.is_local_main_process:
             print(f"On validation/test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
         # print(f"On validation/test set, f1={m_f1}%, EM={m_em}%")
+        
+        ## TODO: test the full training code
 
     def evaluate(self):
         self._load_model()
