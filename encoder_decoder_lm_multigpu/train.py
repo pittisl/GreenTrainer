@@ -322,6 +322,8 @@ class Green_Trainer:
                 param.requires_grad = True
             # cache original weight values
             w_0 = [param.data.clone().detach() for _, param in self.model.named_parameters()]
+            # TODO: you can probably try move w_0 and other w and grads to cpu or manually call torch.cuda.empty_cache()
+            # use numpy to compute importance and del them manually
             
             batch = {k: v.to(self.device) for k, v in batch.items()}
             outputs = self.model(**batch)
