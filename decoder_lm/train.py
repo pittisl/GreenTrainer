@@ -53,7 +53,7 @@ class Trainer:
         writer = SummaryWriter(log_dir=log_dir)
         
         total_time = 0
-        self._runtime_evaluate()
+        self._runtime_evaluate(self.val_loader)
         for epoch in range(num_epochs):
             t_start = time.time()
             
