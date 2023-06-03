@@ -29,7 +29,7 @@ parser.add_argument('--train_type', type=str, default='full_finetuning', help='f
 parser.add_argument('--max_input_length', type=int, default=512, help='number of input tokens for causal language modeling')
 parser.add_argument('--max_output_length', type=int, default=64, help='number of new output tokens for generation')
 parser.add_argument('--batch_size', type=int, default=4, help='batch size during training and generation')
-parser.add_argument('--rho', type=int, default=0.5, help='speedup ratio for GreenTrainer')
+parser.add_argument('--rho', type=float, default=0.5, help='speedup ratio for GreenTrainer')
 
 args = parser.parse_args()
 
