@@ -21,7 +21,10 @@ from utils import make_folders
 # facebook/opt-350m, facebook/opt-1.3b, facebook/opt-2.7b, facebook/opt-6.7b, facebook/opt-13b (13B)
 # scitldr -> [bs=16, in=512, out=256],
 
-# TODO add DDP and corresponding parser https://srijithr.gitlab.io/post/pytorchdist/
+# TODO: add DDP and corresponding parser https://srijithr.gitlab.io/post/pytorchdist/
+# TODO: opt-2.7b and bloomz-3b are working fine by offloading importance evaluation to cpu
+# for opt-6.7b and bloomz-7b, it can start from float16 model and batch size = 1
+# model = AutoModelForCausalLM.from_pretrained(model_type, config=config, torch_dtype=torch.float16)
 
 parser = argparse.ArgumentParser(description='parser for training decoder-only models')
 parser.add_argument('--model_name', type=str, default='facebook/opt-1.3b', help='opt and bloomz series')
