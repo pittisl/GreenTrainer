@@ -55,7 +55,7 @@ rho = args.rho
 
 if scheme == 'baselines':
 
-    train_type = "full_finetuning" # "full_finetuning"
+    # train_type = "full_finetuning" # "full_finetuning"
     model_path = f"saved_models/{model_name.replace('/', '_')}_{train_type}"
     
     model = load_text_generation_model(
