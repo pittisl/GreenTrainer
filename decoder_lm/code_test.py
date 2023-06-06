@@ -9,26 +9,26 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 model_name = "facebook/opt-125m"
 
 model = load_text_generation_model(
-    model_name, "full_finetuning",
+    model_name, "lora",
     output_attentions=False,
 )
 
-t_dy, t_dw = compute_tensor_flops(
-    model=model,
-    model_name=model_name,
-    input_length=1024,
-    batch_size=4,
-    draw_figure=True,
-)
+# t_dy, t_dw = compute_tensor_flops(
+#     model=model,
+#     model_name=model_name,
+#     input_length=1024,
+#     batch_size=4,
+#     draw_figure=True,
+# )
 
-t_forward = compute_forward_flops(
-    model=model,
-    model_name=model_name,
-    input_length=1024,
-    batch_size=4,
-)
+# t_forward = compute_forward_flops(
+#     model=model,
+#     model_name=model_name,
+#     input_length=1024,
+#     batch_size=4,
+# )
 
-print(f"bp/fp = {np.sum(t_dy + t_dw) / t_forward}")
+# print(f"bp/fp = {np.sum(t_dy + t_dw) / t_forward}")
 
 
 # summary = layer_summary(model, print_summary=True)
@@ -36,9 +36,9 @@ print(f"bp/fp = {np.sum(t_dy + t_dw) / t_forward}")
     
 # ._parameters, in_features, out_features
 
-# for k, (name, param) in enumerate(model.named_parameters()):
-#     if param.requires_grad:
-#         print(k, name)
+for k, (name, param) in enumerate(model.named_parameters()):
+    if param.requires_grad:
+        print(k, name)
 
 
 # train_loader, tokenizer = load_samsum_for_t5small(
@@ -360,5 +360,55 @@ print(f"bp/fp = {np.sum(t_dy + t_dw) / t_forward}")
 292 transformer.ln_f.bias torch.Size([1024])
 
 
+
+
+8 base_model.model.model.decoder.layers.0.self_attn.v_proj.lora_A.default.weight   
+9 base_model.model.model.decoder.layers.0.self_attn.v_proj.lora_B.default.weight   
+12 base_model.model.model.decoder.layers.0.self_attn.q_proj.lora_A.default.weight  
+13 base_model.model.model.decoder.layers.0.self_attn.q_proj.lora_B.default.weight  
+28 base_model.model.model.decoder.layers.1.self_attn.v_proj.lora_A.default.weight  
+29 base_model.model.model.decoder.layers.1.self_attn.v_proj.lora_B.default.weight  
+32 base_model.model.model.decoder.layers.1.self_attn.q_proj.lora_A.default.weight  
+33 base_model.model.model.decoder.layers.1.self_attn.q_proj.lora_B.default.weight  
+48 base_model.model.model.decoder.layers.2.self_attn.v_proj.lora_A.default.weight  
+49 base_model.model.model.decoder.layers.2.self_attn.v_proj.lora_B.default.weight  
+52 base_model.model.model.decoder.layers.2.self_attn.q_proj.lora_A.default.weight  
+53 base_model.model.model.decoder.layers.2.self_attn.q_proj.lora_B.default.weight  
+68 base_model.model.model.decoder.layers.3.self_attn.v_proj.lora_A.default.weight  
+69 base_model.model.model.decoder.layers.3.self_attn.v_proj.lora_B.default.weight  
+72 base_model.model.model.decoder.layers.3.self_attn.q_proj.lora_A.default.weight  
+73 base_model.model.model.decoder.layers.3.self_attn.q_proj.lora_B.default.weight  
+88 base_model.model.model.decoder.layers.4.self_attn.v_proj.lora_A.default.weight  
+89 base_model.model.model.decoder.layers.4.self_attn.v_proj.lora_B.default.weight  
+92 base_model.model.model.decoder.layers.4.self_attn.q_proj.lora_A.default.weight  
+93 base_model.model.model.decoder.layers.4.self_attn.q_proj.lora_B.default.weight  
+108 base_model.model.model.decoder.layers.5.self_attn.v_proj.lora_A.default.weight 
+109 base_model.model.model.decoder.layers.5.self_attn.v_proj.lora_B.default.weight 
+112 base_model.model.model.decoder.layers.5.self_attn.q_proj.lora_A.default.weight 
+113 base_model.model.model.decoder.layers.5.self_attn.q_proj.lora_B.default.weight 
+128 base_model.model.model.decoder.layers.6.self_attn.v_proj.lora_A.default.weight 
+129 base_model.model.model.decoder.layers.6.self_attn.v_proj.lora_B.default.weight 
+132 base_model.model.model.decoder.layers.6.self_attn.q_proj.lora_A.default.weight 
+133 base_model.model.model.decoder.layers.6.self_attn.q_proj.lora_B.default.weight 
+148 base_model.model.model.decoder.layers.7.self_attn.v_proj.lora_A.default.weight 
+149 base_model.model.model.decoder.layers.7.self_attn.v_proj.lora_B.default.weight 
+152 base_model.model.model.decoder.layers.7.self_attn.q_proj.lora_A.default.weight 
+153 base_model.model.model.decoder.layers.7.self_attn.q_proj.lora_B.default.weight 
+168 base_model.model.model.decoder.layers.8.self_attn.v_proj.lora_A.default.weight 
+169 base_model.model.model.decoder.layers.8.self_attn.v_proj.lora_B.default.weight 
+172 base_model.model.model.decoder.layers.8.self_attn.q_proj.lora_A.default.weight 
+173 base_model.model.model.decoder.layers.8.self_attn.q_proj.lora_B.default.weight 
+188 base_model.model.model.decoder.layers.9.self_attn.v_proj.lora_A.default.weight 
+189 base_model.model.model.decoder.layers.9.self_attn.v_proj.lora_B.default.weight 
+192 base_model.model.model.decoder.layers.9.self_attn.q_proj.lora_A.default.weight 
+193 base_model.model.model.decoder.layers.9.self_attn.q_proj.lora_B.default.weight 
+208 base_model.model.model.decoder.layers.10.self_attn.v_proj.lora_A.default.weight
+209 base_model.model.model.decoder.layers.10.self_attn.v_proj.lora_B.default.weight
+212 base_model.model.model.decoder.layers.10.self_attn.q_proj.lora_A.default.weight
+213 base_model.model.model.decoder.layers.10.self_attn.q_proj.lora_B.default.weight
+228 base_model.model.model.decoder.layers.11.self_attn.v_proj.lora_A.default.weight
+229 base_model.model.model.decoder.layers.11.self_attn.v_proj.lora_B.default.weight
+232 base_model.model.model.decoder.layers.11.self_attn.q_proj.lora_A.default.weight
+233 base_model.model.model.decoder.layers.11.self_attn.q_proj.lora_B.default.weight
 """
 
