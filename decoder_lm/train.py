@@ -42,7 +42,8 @@ class Trainer:
         learning_rate,
         num_epochs,
         log_dir='logs/'
-    ):
+    ):  
+        # torch.backends.cuda.matmul.allow_tf32 = True
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=learning_rate)
         lr_scheduler = get_linear_schedule_with_warmup(
             optimizer=optimizer,
@@ -53,7 +54,7 @@ class Trainer:
         writer = SummaryWriter(log_dir=log_dir)
         
         total_time = 0
-        self._runtime_evaluate(self.val_loader)
+        # self._runtime_evaluate(self.val_loader)
         for epoch in range(num_epochs):
             t_start = time.time()
             
@@ -258,6 +259,7 @@ class Green_Trainer:
         batch_size=16,
         log_dir='logs/'
     ):
+        # torch.backends.cuda.matmul.allow_tf32 = True
         t_dy, t_dw = compute_tensor_flops(
             model=self.model,
             model_name=self.model_type,
@@ -289,10 +291,13 @@ class Green_Trainer:
         
         def compute_tensor_importance(batch):
             # set all params to be trainable
-            for _, param in self.model.named_parameters():
-                param.requires_grad = True
+            for idx, (_, param) in enumerate(self.model.named_parameters()):
+                if idx < N_limit:
+                    param.requires_grad = False
+                else:
+                    param.requires_grad = True
             # cache original weight values
-            w_0 = [param.data.clone().detach().cpu() for _, param in self.model.named_parameters()]
+            w_0 = [param.data.clone().detach().cpu()  for _, param in self.model.named_parameters()]
             
             batch = {k: v.to(self.device) for k, v in batch.items()}
             outputs = self.model(
@@ -319,13 +324,15 @@ class Green_Trainer:
             )
             loss = outputs.loss
             loss.backward()
-            grad_1 = [param.grad.clone().detach().cpu() for _, param in self.model.named_parameters()]
+            grad_1 = [param.grad.clone().detach().cpu() if param.grad is not None else torch.tensor(0.0).cpu() for _, param in self.model.named_parameters()]
             optimizer.step()
             # lr_scheduler.step()
             optimizer.zero_grad()
             I = [torch.sum((grad_1_k * dw_0_k)) for (grad_1_k, dw_0_k) in zip(grad_1, dw_0)]
             I = torch.tensor(I)
+            # print(I)
             I = I / torch.max(torch.abs(I))
+            # print(I)
             # restore weights
             for k, (_, param) in enumerate(self.model.named_parameters()):
                 param.data = w_0[k]
@@ -341,7 +348,18 @@ class Green_Trainer:
             return rho_bp
         
         rho_bp = to_backward_rho(rho, t_fp, t_dy, t_dw)
-          
+        N = t_dw.shape[0]
+        T = np.sum(t_dw + t_dy) # maximally possible BP time
+        T_limit = rho_bp * T
+        t_dy_cumsum = 0
+        t_dy_flipped = np.flip(t_dy)
+        for k in range(N):
+            t_dy_cumsum += t_dy_flipped[k]
+            if t_dy_cumsum > T_limit:
+                break
+        N_limit = N - k
+        print(f"N: {N}, N_limit: {N_limit}")
+
         total_time = 0
         total_bp_flops = []
         total_bfp_flops = []
@@ -372,7 +390,7 @@ class Green_Trainer:
                         param.requires_grad = True
                     else:
                         param.requires_grad = False
-                model.to(self.device)
+                self.model.to(self.device)
             
             for step, batch in enumerate(tqdm(self.train_loader)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}

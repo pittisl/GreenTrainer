@@ -1,4 +1,4 @@
-MODEL_NAME="facebook/opt-2.7b"
+MODEL_NAME="facebook/opt-6.7b"
 
 # GreenTrainer-0.5
 python3 main.py --model_name $MODEL_NAME \
@@ -7,8 +7,8 @@ python3 main.py --model_name $MODEL_NAME \
                 --max_input_length 512 \
                 --max_output_length 64 \
                 --batch_size 4 \
-                --rho 0.5
-
+                --rho 0.4
+<<cc
 # GreenTrainer-0.7
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
@@ -16,7 +16,7 @@ python3 main.py --model_name $MODEL_NAME \
                 --max_input_length 512 \
                 --max_output_length 64 \
                 --batch_size 4 \
-                --rho 0.7
+                --rho 0.45
 
 # Full Finetuning
 python3 main.py --model_name $MODEL_NAME \
@@ -35,5 +35,5 @@ python3 main.py --model_name $MODEL_NAME \
                 --max_input_length 512 \
                 --max_output_length 64 \
                 --batch_size 4
-
+cc
 

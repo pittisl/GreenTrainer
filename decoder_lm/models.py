@@ -3,6 +3,7 @@ from peft import (
     get_peft_model,
     LoraConfig, AdaLoraConfig, PrefixTuningConfig,
 )
+import torch
 
 def load_text_generation_model(
     model_type, 

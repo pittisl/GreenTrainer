@@ -279,10 +279,13 @@ class Green_Trainer:
         
         def compute_tensor_importance(batch):
             # set all params to be trainable
-            for _, param in self.model.named_parameters():
-                param.requires_grad = True
+            for idx, (_, param) in enumerate(self.model.named_parameters()):
+                if idx < N_limit:
+                    param.requires_grad = False
+                else:
+                    param.requires_grad = True
             # cache original weight values
-            w_0 = [param.data.clone().detach() for _, param in self.model.named_parameters()]
+            w_0 = [param.data.clone().detach().cpu() for _, param in self.model.named_parameters()]
             
             batch = {k: v.to(self.device) for k, v in batch.items()}
             outputs = self.model(**batch)
@@ -293,7 +296,7 @@ class Green_Trainer:
             # lr_scheduler.step()
             optimizer.zero_grad()
             # cache updated weight values
-            w_1 = [param.data.clone().detach() for _, param in self.model.named_parameters()]
+            w_1 = [param.data.clone().detach().cpu() for _, param in self.model.named_parameters()]
             # compute weight changes, it takes optimizer's schedule into account
             dw_0 = [w_1_k - w_0_k for (w_0_k, w_1_k) in zip(w_0, w_1)]
             
@@ -301,7 +304,7 @@ class Green_Trainer:
             outputs = self.model(**batch)
             loss = outputs.loss
             loss.backward()
-            grad_1 = [param.grad.clone().detach() for _, param in self.model.named_parameters()]
+            grad_1 = [param.grad.clone().detach().cpu() for _, param in self.model.named_parameters()]
             optimizer.step()
             # lr_scheduler.step()
             optimizer.zero_grad()
@@ -311,7 +314,7 @@ class Green_Trainer:
             # restore weights
             for k, (_, param) in enumerate(self.model.named_parameters()):
                 param.data = w_0[k]
-            return dw_0, I
+            return I
         
         def to_backward_rho(rho, t_fp, t_dy, t_dw):
             t_bp = np.sum(t_dy + t_dw)
@@ -323,6 +326,17 @@ class Green_Trainer:
             return rho_bp
         
         rho_bp = to_backward_rho(rho, t_fp, t_dy, t_dw)
+        N = t_dw.shape[0]
+        T = np.sum(t_dw + t_dy) # maximally possible BP time
+        T_limit = rho_bp * T
+        t_dy_cumsum = 0
+        t_dy_flipped = np.flip(t_dy)
+        for k in range(N):
+            t_dy_cumsum += t_dy_flipped[k]
+            if t_dy_cumsum > T_limit:
+                break
+        N_limit = N - k
+        print(f"N: {N}, N_limit: {N_limit}")
           
         total_time = 0
         total_bp_flops = []
@@ -339,7 +353,7 @@ class Green_Trainer:
                 print("#### Selecting trainable tensors...")
                 data_iter = iter(self.train_loader)
                 batch = next(data_iter)
-                dw, I = compute_tensor_importance(batch)
+                I = compute_tensor_importance(batch)
                 I = -I.numpy()
                 I = np.flip(I)
                 # print("disco:", disco)
@@ -354,6 +368,7 @@ class Green_Trainer:
                         param.requires_grad = True
                     else:
                         param.requires_grad = False
+                self.model.to(self.device)
             
             for step, batch in enumerate(tqdm(self.train_loader)):
                 batch = {k: v.to(self.device) for k, v in batch.items()}
