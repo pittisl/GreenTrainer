@@ -1,5 +1,5 @@
 # Introduction
-This is the official code repository for GreenTrainer.
+This is the official code repository for GreenTrainer. **We are still finalizing the code and please stay tuned for the final release**.
 # Requirements
 All the experiments are run on Lambda Cloud Instances. To install all the packages, run the following command
 ```
