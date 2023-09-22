@@ -287,7 +287,7 @@ class Green_Trainer:
             outputs = self.model(**batch)
             loss = outputs.loss
             loss.backward()
-            grad_1 = [param.grad.clone().detach().cpu() for _, param in self.model.named_parameters()]
+            grad_1 = [param.grad.clone().detach().cpu() if param.grad is not None else torch.tensor(0.0).cpu() for _, param in self.model.named_parameters()]
             optimizer.step()
             # lr_scheduler.step()
             optimizer.zero_grad()

@@ -181,6 +181,7 @@ elif scheme == 'green_trainer':
             num_epochs=5,
             input_length=max_input_length,
             output_length=max_output_length,
+            batch_size=batch_size,
             rho=rho,
             log_dir=f"logs/{model_name.replace('/', '_')}_{train_type}_{rho}"
         )
