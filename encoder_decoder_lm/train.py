@@ -110,9 +110,6 @@ class Trainer:
         m_rouge2 = 0
         m_rougeL = 0
         m_rougeLsum = 0
-        # for question answering
-        m_f1 = 0
-        m_em = 0
         
         total_count = 0
         with torch.no_grad():
@@ -129,14 +126,11 @@ class Trainer:
                 )
                 
                 summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
-                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
                 m_rougeL += (summarization_results['rougeL'] * batch_size)
                 m_rougeLsum += (summarization_results['rougeLsum'] * batch_size)
-                m_f1 += (qa_results["f1"] * batch_size)
-                m_em += (qa_results["EM"] * batch_size)
                 
                 total_count += batch_size
         
@@ -144,10 +138,7 @@ class Trainer:
         m_rouge2/= total_count
         m_rougeL /= total_count
         m_rougeLsum /= total_count
-        m_f1 /= total_count
-        m_em /= total_count
         print(f"On validation/test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On validation/test set, f1={m_f1}%, EM={m_em}%")
 
     def evaluate(self):
         self._load_model()
@@ -159,9 +150,6 @@ class Trainer:
         m_rouge2 = 0
         m_rougeL = 0
         m_rougeLsum = 0
-        # for question answering
-        m_f1 = 0
-        m_em = 0
         
         total_count = 0
         with torch.no_grad():
@@ -178,14 +166,11 @@ class Trainer:
                 )
                 
                 summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
-                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
                 m_rougeL += (summarization_results['rougeL'] * batch_size)
                 m_rougeLsum += (summarization_results['rougeLsum'] * batch_size)
-                m_f1 += (qa_results["f1"] * batch_size)
-                m_em += (qa_results["EM"] * batch_size)
                 
                 total_count += batch_size
         
@@ -193,10 +178,8 @@ class Trainer:
         m_rouge2/= total_count
         m_rougeL /= total_count
         m_rougeLsum /= total_count
-        m_f1 /= total_count
-        m_em /= total_count
+        
         print(f"On test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On test set, f1={m_f1}%, EM={m_em}%")
     
     def _save_model(self):
         self.model.save_pretrained(self.model_path)
@@ -428,9 +411,6 @@ class Green_Trainer:
         m_rouge2 = 0
         m_rougeL = 0
         m_rougeLsum = 0
-        # for question answering
-        m_f1 = 0
-        m_em = 0
         
         total_count = 0
         with torch.no_grad():
@@ -447,14 +427,11 @@ class Green_Trainer:
                 )
                 
                 summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
-                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
                 m_rougeL += (summarization_results['rougeL'] * batch_size)
                 m_rougeLsum += (summarization_results['rougeLsum'] * batch_size)
-                m_f1 += (qa_results["f1"] * batch_size)
-                m_em += (qa_results["EM"] * batch_size)
                 
                 total_count += batch_size
         
@@ -462,10 +439,7 @@ class Green_Trainer:
         m_rouge2/= total_count
         m_rougeL /= total_count
         m_rougeLsum /= total_count
-        m_f1 /= total_count
-        m_em /= total_count
         print(f"On validation/test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On validation/test set, f1={m_f1}%, EM={m_em}%")
 
     def evaluate(self):
         self._load_model()
@@ -477,9 +451,6 @@ class Green_Trainer:
         m_rouge2 = 0
         m_rougeL = 0
         m_rougeLsum = 0
-        # for question answering
-        m_f1 = 0
-        m_em = 0
         
         total_count = 0
         with torch.no_grad():
@@ -496,14 +467,11 @@ class Green_Trainer:
                 )
                 
                 summarization_results = self.rouge_metric.compute(predictions=all_results["outputs_text"], references=all_results["labels_text"])
-                qa_results = compute_squad_metric(self.tokenizer, predictions=all_results["outputs_tokens"], references=all_results["labels_tokens"])
                 
                 m_rouge1 += (summarization_results['rouge1'] * batch_size)
                 m_rouge2 += (summarization_results['rouge2'] * batch_size)
                 m_rougeL += (summarization_results['rougeL'] * batch_size)
                 m_rougeLsum += (summarization_results['rougeLsum'] * batch_size)
-                m_f1 += (qa_results["f1"] * batch_size)
-                m_em += (qa_results["EM"] * batch_size)
                 
                 total_count += batch_size
         
@@ -511,10 +479,7 @@ class Green_Trainer:
         m_rouge2/= total_count
         m_rougeL /= total_count
         m_rougeLsum /= total_count
-        m_f1 /= total_count
-        m_em /= total_count
         print(f"On test set, rouge1={100*m_rouge1}, rouge2={100*m_rouge2}, rougeL={100*m_rougeL}, rougeLsum={100*m_rougeLsum}")
-        print(f"On test set, f1={m_f1}%, EM={m_em}%")
     
     def _save_model(self):
         self.model.save_pretrained(self.model_path)

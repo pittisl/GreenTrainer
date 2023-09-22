@@ -1,5 +1,5 @@
 MODEL_NAME="bigscience/bloomz-3b" # bigscience/bloomz-3b
-<<cc
+
 # GreenTrainer-0.5
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
@@ -26,7 +26,7 @@ python3 main.py --model_name $MODEL_NAME \
                 --max_input_length 512 \
                 --max_output_length 64 \
                 --batch_size 4
-cc
+
 # LoRA
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
