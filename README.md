@@ -1,23 +1,29 @@
-# Introduction
-This is the official code repository for GreenTrainer. **We are still finalizing the code and please stay tuned for the final release**.
-# Requirements
-All the experiments are run on Lambda Cloud Instances. To install all the packages, run the following command
+# Towards Green AI in Fine-tuning Large Language Models via Adaptive Backpropagation
+
+## Introduction
+This is the official code repository for the paper "Towards Green AI in Fine-tuning Large Language Models via Adaptive Backpropagation". GreenTrainer adaptively selects the trainable tensors for backpropagation, to achieve user-specific finetuning FLOPs speedup while retaining accuracy. GreenTrainer is an extension to LLMs from our previous work [ElasticTrainer](https://github.com/pittisl/ElasticTrainer).
+
+* **We are still cleaning the code for multi-GPU finetuning and please stay tuned for the final release**.
+
+
+## Requirements
+All the experiments are run on Lambda Cloud Instances. To install all the dependencies, run the following command
 ```
 bash requirements.sh
 ```
-# Basic Usage
-For decoder structures, navigate to `decoder_lm` folder. Run the following commands to train
+## General Usage
+For decoder structures, navigate to `decoder_lm` folder. Run the following commands to finetune
 
 ```
-bash opt_scitldr.sh # train opt model on scitldr dataset
-bash opt_dialogsum.sh # train opt model on scitldr dataset
+bash opt_scitldr.sh # finetune OPT-2.7B model on scitldr dataset
+bash opt_dialogsum.sh # finetune OPT-2.7B model on scitldr dataset
 ```
 
 or pass specific configurations to main.py
 
 ```
 # GreenTrainer-0.5
-python3 main.py --model_name $MODEL_NAME \
+python3 main.py --model_name facebook/opt-2.7b \
                 --dataset_name scitldr \
                 --scheme green_trainer \
                 --max_input_length 512 \
@@ -27,3 +33,24 @@ python3 main.py --model_name $MODEL_NAME \
 ```
 
 For encoder-decoder structures, navigate to `encoder_decoder_lm`. Follow similar steps above.
+
+## Reproducing Paper Results
+Most of experiments in our paper are run on a Lambda Cloud Instance with a single Nvidia H100 80GB GPU and 24 vCPUs. If you select other configurations, the wall-clock time measurements will not match the results in our paper. Please run the following scripts to reproduce main results for OPT-2.7B, BLOOMZ-3B, and FLAN-T5-3B respectively:
+
+Navigate to `decoder_lm` folder,
+```
+# finetuning OPT-2.7B on SciTLDR and DialogSum datasets
+bash opt_scitldr.sh
+bash opt_dialogsum.sh
+
+# finetuning OPT-2.7B on SciTLDR and DialogSum datasets
+bash bloom_scitldr.sh
+bash bloom_dialogsum.sh
+```
+Nvigate to `encoder_decoder_lm` folder,
+```
+# finetuning FLAN-T5-3B on SciTLDR and DialogSum datasets
+bash flant5_scitldr.sh
+bash flant5_dialogsum.sh
+```
+

@@ -53,11 +53,12 @@ def load_text_generation_model(
                 param.requires_grad = False
         
     elif train_type == 'lora':
+        target_modules = ["query_key_value"] if 'bloom' in model_type else ["q_proj", "v_proj"] # ["q_proj", "v_proj"] for opt, ["query_key_value"] for bloom
         peft_config = LoraConfig(
             peft_type="LORA", 
             task_type="CAUSAL_LM", 
             inference_mode=False, 
-            r=8, lora_alpha=32, target_modules=["q_proj", "v_proj"], # ["q_proj", "v_proj"] for opt, ["query_key_value"] for bloom
+            r=8, lora_alpha=32, target_modules=target_modules, 
             lora_dropout=0.1,
         )
         model = get_peft_model(model, peft_config)

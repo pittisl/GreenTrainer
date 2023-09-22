@@ -1,6 +1,7 @@
-MODEL_NAME="facebook/opt-6.7b"
+MODEL_NAME="facebook/opt-2.7b"
 
 # GreenTrainer-0.5
+echo '### GreenTrainer-0.5'
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
                 --scheme green_trainer \
@@ -10,6 +11,7 @@ python3 main.py --model_name $MODEL_NAME \
                 --rho 0.5
 
 # GreenTrainer-0.7
+echo '### GreenTrainer-0.7'
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
                 --scheme green_trainer \
@@ -19,6 +21,7 @@ python3 main.py --model_name $MODEL_NAME \
                 --rho 0.7
 
 # Full Finetuning
+echo '### Full Finetuning'
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
                 --scheme baselines \
@@ -28,6 +31,7 @@ python3 main.py --model_name $MODEL_NAME \
                 --batch_size 4
 
 # LoRA
+echo '### LoRA'
 python3 main.py --model_name $MODEL_NAME \
                 --dataset_name scitldr \
                 --scheme baselines \
