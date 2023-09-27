@@ -54,3 +54,14 @@ bash flant5_scitldr.sh
 bash flant5_dialogsum.sh
 ```
 
+## Citation
+```
+@article{huang2023towards,
+  title={Towards Green AI in Fine-tuning Large Language Models via Adaptive Backpropagation},
+  author={Huang, Kai and Yin, Hanyun and Huang, Heng and Gao, Wei},
+  journal={arXiv preprint arXiv:2309.13192},
+  year={2023}
+}
+
+```
+
