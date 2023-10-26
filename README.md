@@ -3,8 +3,6 @@
 ## Introduction
 This is the official code repository for the paper ["Towards Green AI in Fine-tuning Large Language Models via Adaptive Backpropagation"](https://arxiv.org/abs/2309.13192). GreenTrainer adaptively selects the trainable tensors for backpropagation, to achieve user-specified finetuning FLOPs reduction while retaining accuracy. GreenTrainer is an extension to LLMs from our previous work [ElasticTrainer](https://github.com/pittisl/ElasticTrainer).
 
-* **We are still cleaning the code for multi-GPU finetuning and please stay tuned for the final release**.
-
 
 ## Requirements
 All the experiments are run on Lambda Cloud Instances. To install all the dependencies, run the following command
