@@ -41,9 +41,13 @@ Navigate to `decoder_lm` folder,
 bash opt_scitldr.sh
 bash opt_dialogsum.sh
 
-# finetuning OPT-2.7B on SciTLDR and DialogSum datasets
+# finetuning BLOOMZ-3B on SciTLDR and DialogSum datasets
 bash bloom_scitldr.sh
 bash bloom_dialogsum.sh
+
+# finetuning OPT-2.7B on webquestions and piqa datasets
+bash opt_webquestions.sh
+bash opt_piqa.sh
 ```
 Nvigate to `encoder_decoder_lm` folder,
 ```
@@ -51,6 +55,7 @@ Nvigate to `encoder_decoder_lm` folder,
 bash flant5_scitldr.sh
 bash flant5_dialogsum.sh
 ```
+**Note:** For OPT and BLOOMZ, we adopt prompt structure `{src} TL;DR: {summary}` on SciTLDR and DialogSum datasets, `question:{q}</s>answer:{a}</s>` on webquestions dataset, and `goal:{goal}</s>sol1:{sol1}</s>sol2:{sol2}</s>label:{label}</s>` on piqa dataset. For summarization datasets, `{src} TL;DR: {summary}</s>` should give better results but we didn't adopt this when writing this paper. 
 
 ## Citation
 ```

@@ -77,6 +77,28 @@ def dataset_loader(
             keep_in_memory=keep_in_memory,
             print_info=print_info,
         )
+    elif dataset_name == "piqa":
+        dataloader, tokenizer = load_piqa(
+            split=split,
+            tokenizer_name=tokenizer_name,
+            model_name=model_name,
+            max_input_length=max_input_length,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            keep_in_memory=keep_in_memory,
+            print_info=print_info,
+        )
+    elif dataset_name == "webquestions":
+        dataloader, tokenizer = load_webquestions(
+            split=split,
+            tokenizer_name=tokenizer_name,
+            model_name=model_name,
+            max_input_length=max_input_length,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            keep_in_memory=keep_in_memory,
+            print_info=print_info,
+        )
     elif dataset_name == "duorcs":
         dataloader, tokenizer = load_duorcs(
             split=split,
@@ -594,6 +616,229 @@ def load_scitldr(
         examples = [
             f"{_truncate_context(' '.join(context))} TL;DR: {summary[0]}" for context, summary in zip(raw_examples['source'], raw_examples['target'])
         ]
+        # left-padded source for validation & testing
+        tokenizer.padding_side = "left"
+        
+        if 'gpt2' in model_name:
+            tokenizer.pad_token = tokenizer.eos_token
+            
+        lp_sources = tokenizer(
+            sources,
+            max_length=max_input_length,
+            padding="max_length", 
+            truncation=True,
+            return_tensors="pt",
+        )
+        
+        examples_tokenized, sources_tokenized = [_tokenize_fn(strings) for strings in (examples, sources)]
+        input_ids = examples_tokenized["input_ids"]
+        attention_mask = examples_tokenized["attention_mask"]
+        labels = copy.deepcopy(input_ids)
+        for label, source_len in zip(labels, sources_tokenized["input_ids_lens"]):
+            label[:source_len] = -100 # mask source
+            label[label == tokenizer.pad_token_id] = -100 # mask paddings
+        return dict(
+            input_ids=input_ids, 
+            attention_mask=attention_mask, 
+            labels=labels, 
+            input_ids_lens=sources_tokenized["input_ids_lens"],
+            lp_sources=lp_sources["input_ids"])
+    
+    processed_dataset = dataset.map(preprocess_fn, batched=True)
+    processed_dataset.set_format(
+        type="torch", columns=["input_ids", "attention_mask", "labels", "input_ids_lens", "lp_sources"]
+    )
+    dataloader = DataLoader(
+        processed_dataset, shuffle=shuffle, 
+        collate_fn=default_data_collator, 
+        batch_size=batch_size, pin_memory=True,
+    )
+    return dataloader, tokenizer
+
+
+def load_piqa(
+    split,
+    tokenizer_name,
+    model_name,
+    max_input_length,
+    batch_size,
+    shuffle=True,
+    keep_in_memory=False,
+    print_info=False,
+):
+    """load piqa dataset
+    train: 16.1k, valid: 1.84k, test: 3.08k
+    """
+    
+    dataset = load_dataset(
+        "piqa", split=split, 
+        keep_in_memory=keep_in_memory
+    )
+    dataset.cleanup_cache_files()
+    if 'opt' in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, use_fast=False)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    
+    if print_info:
+        print("train: 16.1k, valid: 1.84k, test: 3.08k")    
+        
+    def _tokenize_fn(strings):
+        """Tokenize a list of strings, memorize source length"""
+        tokenizer.padding_side = "right" 
+        tokenized_list = [
+            tokenizer(
+                text,
+                max_length=max_input_length,
+                padding="max_length", 
+                truncation=True,
+                return_tensors="pt",
+            )
+            for text in strings
+        ]
+        input_ids = labels = [tokenized.input_ids[0] for tokenized in tokenized_list]
+        attention_mask = [tokenized.attention_mask[0] for tokenized in tokenized_list]
+        input_ids_lens = labels_lens = [
+            mask.sum().item() for mask in attention_mask
+        ]
+        return dict(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            labels=labels,
+            input_ids_lens=input_ids_lens,
+            labels_lens=labels_lens,
+        )   
+    
+    def _truncate_context(context, max_length=416):
+        context_tokens = tokenizer(context)
+        truncate_ratio = max_length / (len(context_tokens["input_ids"]) + 1e-5)
+        if truncate_ratio < 1:
+            return context[:int(len(context) * truncate_ratio)]
+        else:
+            return context 
+    
+    def preprocess_fn(raw_examples):
+        """preprocess example strings, mask source part in labels"""
+        sources = [
+            f"goal:{_truncate_context(goal, 128)}</s>sol1:{_truncate_context(sol1, 128)}</s>sol2:{_truncate_context(sol2, 128)}</s>label:" 
+            for goal, sol1, sol2 in zip(raw_examples['goal'], raw_examples['sol1'], raw_examples['sol2'])
+        ]
+        examples = [
+            f"goal:{_truncate_context(goal, 128)}</s>sol1:{_truncate_context(sol1, 128)}</s>sol2:{_truncate_context(sol2, 128)}</s>label:{label}</s>" 
+            for goal, sol1, sol2, label in zip(raw_examples['goal'], raw_examples['sol1'], raw_examples['sol2'], raw_examples['label'])
+        ]
+        
+        # left-padded source for validation & testing
+        tokenizer.padding_side = "left"
+        
+        if 'gpt2' in model_name:
+            tokenizer.pad_token = tokenizer.eos_token
+            
+        lp_sources = tokenizer(
+            sources,
+            max_length=max_input_length,
+            padding="max_length", 
+            truncation=True,
+            return_tensors="pt",
+        )
+        
+        examples_tokenized, sources_tokenized = [_tokenize_fn(strings) for strings in (examples, sources)]
+        input_ids = examples_tokenized["input_ids"]
+        attention_mask = examples_tokenized["attention_mask"]
+        labels = copy.deepcopy(input_ids)
+        for label, source_len in zip(labels, sources_tokenized["input_ids_lens"]):
+            label[:source_len] = -100 # mask source
+            label[label == tokenizer.pad_token_id] = -100 # mask paddings
+        return dict(
+            input_ids=input_ids, 
+            attention_mask=attention_mask, 
+            labels=labels, 
+            input_ids_lens=sources_tokenized["input_ids_lens"],
+            lp_sources=lp_sources["input_ids"])
+    
+    processed_dataset = dataset.map(preprocess_fn, batched=True)
+    processed_dataset.set_format(
+        type="torch", columns=["input_ids", "attention_mask", "labels", "input_ids_lens", "lp_sources"]
+    )
+    dataloader = DataLoader(
+        processed_dataset, shuffle=shuffle, 
+        collate_fn=default_data_collator, 
+        batch_size=batch_size, pin_memory=True,
+    )
+    return dataloader, tokenizer
+
+
+def load_webquestions(
+    split,
+    tokenizer_name,
+    model_name,
+    max_input_length,
+    batch_size,
+    shuffle=True,
+    keep_in_memory=False,
+    print_info=False,
+):
+    """load webquestions dataset
+    train: 3.78k, test: 2.03k
+    """
+    
+    dataset = load_dataset(
+        "web_questions", split=split, 
+        keep_in_memory=keep_in_memory
+    )
+    dataset.cleanup_cache_files()
+    if 'opt' in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, use_fast=False)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    
+    if print_info:
+        print("train: 3.78k, test: 2.03k")    
+        
+    def _tokenize_fn(strings):
+        """Tokenize a list of strings, memorize source length"""
+        tokenizer.padding_side = "right" 
+        tokenized_list = [
+            tokenizer(
+                text,
+                max_length=max_input_length,
+                padding="max_length", 
+                truncation=True,
+                return_tensors="pt",
+            )
+            for text in strings
+        ]
+        input_ids = labels = [tokenized.input_ids[0] for tokenized in tokenized_list]
+        attention_mask = [tokenized.attention_mask[0] for tokenized in tokenized_list]
+        input_ids_lens = labels_lens = [
+            mask.sum().item() for mask in attention_mask
+        ]
+        return dict(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            labels=labels,
+            input_ids_lens=input_ids_lens,
+            labels_lens=labels_lens,
+        )   
+    
+    def _truncate_context(context, max_length=416):
+        context_tokens = tokenizer(context)
+        truncate_ratio = max_length / (len(context_tokens["input_ids"]) + 1e-5)
+        if truncate_ratio < 1:
+            return context[:int(len(context) * truncate_ratio)]
+        else:
+            return context 
+    
+    def preprocess_fn(raw_examples):
+        """preprocess example strings, mask source part in labels"""
+        sources = [
+            f"question:{_truncate_context(q, 72)}</s>answer:" for q in raw_examples["question"]
+        ]
+        
+        examples = [
+            f"question:{_truncate_context(q, 72)}</s>answer:{_truncate_context(a[0], 64)}</s>" for q, a in zip(raw_examples["question"], raw_examples["answers"])
+        ]
+        
         # left-padded source for validation & testing
         tokenizer.padding_side = "left"
         
