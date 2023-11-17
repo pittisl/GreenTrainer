@@ -1,6 +1,7 @@
 import os
 import argparse
-from train import Trainer, Green_Trainer
+import train, train_qa
+# from train import Trainer, Green_Trainer
 from models import load_text_generation_model
 from data import dataset_loader
 from utils import make_folders
@@ -99,8 +100,7 @@ if task == "summarization":
             keep_in_memory=True,
             print_info=False,
         )
-
-        my_trainer = Trainer(
+        my_trainer = train.Trainer(
             train_loader=train_loader,
             val_loader=val_loader,
             test_loader=test_loader,
@@ -165,7 +165,7 @@ if task == "summarization":
             print_info=False,
         )
 
-        my_trainer = Green_Trainer(
+        my_trainer = train.Green_Trainer(
             train_loader=train_loader,
             val_loader=val_loader,
             test_loader=test_loader,
@@ -247,7 +247,7 @@ elif task == "qa":
                 print_info=False,
             )
 
-        my_trainer = Trainer(
+        my_trainer = train_qa.Trainer(
             train_loader=train_loader,
             val_loader=val_loader,
             test_loader=test_loader,
@@ -325,7 +325,7 @@ elif task == "qa":
                 print_info=False,
             )
 
-        my_trainer = Green_Trainer(
+        my_trainer = train_qa.Green_Trainer(
             train_loader=train_loader,
             val_loader=val_loader,
             test_loader=test_loader,
